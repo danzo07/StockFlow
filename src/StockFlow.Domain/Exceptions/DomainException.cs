@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace StockFlow.Domain.Exceptions;
 
-namespace StockFlow.Domain.Exceptions
+public class DomainException : Exception
 {
-    internal class DomainException
-    {
-    }
+    public DomainException(string message) : base(message) { }
 }
