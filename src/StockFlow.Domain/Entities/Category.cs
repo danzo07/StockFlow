@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using StockFlow.Domain.Common;
 
-namespace StockFlow.Domain.Entities
+namespace StockFlow.Domain.Entities;
+
+public class Category : BaseEntity
 {
-    internal class Category
-    {
-    }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }
