@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace StockFlow.Application.Common;
 
-namespace StockFlow.Application.Common
+using Microsoft.EntityFrameworkCore;
+using StockFlow.Domain.Entities;
+
+
+
+public interface IAppDbContext
 {
-    internal class IAppDbContext
-    {
-    }
+    DbSet<Category> Categories { get; }
+    DbSet<Product> Products { get; }
+    DbSet<StockMovement> StockMovements { get; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
