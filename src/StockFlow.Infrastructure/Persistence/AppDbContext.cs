@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StockFlow.Application.Common;
 using StockFlow.Domain.Entities;
 
 namespace StockFlow.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
