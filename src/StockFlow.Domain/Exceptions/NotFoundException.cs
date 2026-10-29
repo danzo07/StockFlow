@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace StockFlow.Domain.Exceptions;
 
-namespace StockFlow.Domain.Exceptions
+public class NotFoundException : Exception
 {
-    internal class NotFoundException
-    {
-    }
+    public NotFoundException(string entity, object key)
+        : base($"{entity} avec l'identifiant {key} est introuvable.") { }
 }
