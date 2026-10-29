@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockFlow.Application.Categories;
-using StockFlow.Domain.Exceptions;
 
 namespace StockFlow.API.Controllers;
 
@@ -17,53 +16,24 @@ public class CategoriesController : ControllerBase
         Ok(await _service.GetAllAsync(ct));
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<CategoryDto>> GetById(int id, CancellationToken ct)
-    {
-        CategoryDto? category = await _service.GetByIdAsync(id, ct);
-        return category is null ? NotFound() : Ok(category);
-    }
+    public async Task<ActionResult<CategoryDto>> GetById(int id, CancellationToken ct) =>
+        Ok(await _service.GetByIdAsync(id, ct));
 
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> Create(SaveCategoryDto dto, CancellationToken ct)
     {
-        try
-        {
-            CategoryDto created = await _service.CreateAsync(dto, ct);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-        catch (DomainException ex)
-        {
-            return Conflict409(ex);
-        }
+        CategoryDto created = await _service.CreateAsync(dto, ct);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<CategoryDto>> Update(int id, SaveCategoryDto dto, CancellationToken ct)
-    {
-        try
-        {
-            CategoryDto? updated = await _service.UpdateAsync(id, dto, ct);
-            return updated is null ? NotFound() : Ok(updated);
-        }
-        catch (DomainException ex)
-        {
-            return Conflict409(ex);
-        }
-    }
+    public async Task<ActionResult<CategoryDto>> Update(int id, SaveCategoryDto dto, CancellationToken ct) =>
+        Ok(await _service.UpdateAsync(id, dto, ct));
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        try
-        {
-            return await _service.DeleteAsync(id, ct) ? NoContent() : NotFound();
-        }
-        catch (DomainException ex)
-        {
-            return Conflict409(ex);
-        }
+        await _service.DeleteAsync(id, ct);
+        return NoContent();
     }
-
-    private ObjectResult Conflict409(DomainException ex) =>
-        Problem(detail: ex.Message, statusCode: StatusCodes.Status409Conflict, title: "Conflit");
 }

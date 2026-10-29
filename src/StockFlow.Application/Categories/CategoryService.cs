@@ -18,12 +18,13 @@ public class CategoryService : ICategoryService
             .Select(c => new CategoryDto(c.Id, c.Name, c.Description))
             .ToListAsync(ct);
 
-    public Task<CategoryDto?> GetByIdAsync(int id, CancellationToken ct) =>
-        _db.Categories
+    public async Task<CategoryDto> GetByIdAsync(int id, CancellationToken ct) =>
+        await _db.Categories
             .AsNoTracking()
             .Where(c => c.Id == id)
             .Select(c => new CategoryDto(c.Id, c.Name, c.Description))
-            .FirstOrDefaultAsync(ct);
+            .FirstOrDefaultAsync(ct)
+        ?? throw new NotFoundException("Catégorie", id);
 
     public async Task<CategoryDto> CreateAsync(SaveCategoryDto dto, CancellationToken ct)
     {
@@ -31,17 +32,17 @@ public class CategoryService : ICategoryService
         if (await _db.Categories.AnyAsync(c => c.Name == name, ct))
             throw new DomainException($"La catégorie '{name}' existe déjà.");
 
-        var category = new Category { Name = name, Description = dto.Description?.Trim() };
+        Category category = new() { Name = name, Description = dto.Description?.Trim() };
         _db.Categories.Add(category);
         await _db.SaveChangesAsync(ct);
 
         return new CategoryDto(category.Id, category.Name, category.Description);
     }
 
-    public async Task<CategoryDto?> UpdateAsync(int id, SaveCategoryDto dto, CancellationToken ct)
+    public async Task<CategoryDto> UpdateAsync(int id, SaveCategoryDto dto, CancellationToken ct)
     {
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id, ct);
-        if (category is null) return null;
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id, ct)
+            ?? throw new NotFoundException("Catégorie", id);
 
         string name = dto.Name.Trim();
         if (await _db.Categories.AnyAsync(c => c.Name == name && c.Id != id, ct))
@@ -55,16 +56,15 @@ public class CategoryService : ICategoryService
         return new CategoryDto(category.Id, category.Name, category.Description);
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    public async Task DeleteAsync(int id, CancellationToken ct)
     {
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id, ct);
-        if (category is null) return false;
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id, ct)
+            ?? throw new NotFoundException("Catégorie", id);
 
         if (await _db.Products.AnyAsync(p => p.CategoryId == id, ct))
             throw new DomainException("Impossible de supprimer une catégorie qui contient des produits.");
 
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync(ct);
-        return true;
     }
 }
