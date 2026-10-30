@@ -4,7 +4,9 @@ using Scalar.AspNetCore;
 using StockFlow.API.Middleware;
 using StockFlow.Application.Categories;
 using StockFlow.Application.Common;
+using StockFlow.Application.Products;
 using StockFlow.Infrastructure.Persistence;
+
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,7 @@ builder.Services.AddScoped<IAppDbContext>(
     sp => sp.GetRequiredService<AppDbContext>());
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
